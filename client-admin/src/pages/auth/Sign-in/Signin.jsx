@@ -10,16 +10,39 @@ const Signin = () => {
 	const dispatch = useDispatch();
 	const [showPassword, setShowPassword] = useState(false);
 	const [userLogin, setUserLogin] = useState({
-		email: "",
+		usernameOrEmail: "",
 		password: "",
 	});
 
-	const submitHandler = (e) => {
+	const submitHandler = async (e) => {
 		e.preventDefault();
 
-		console.log(userLogin);
-		dispatch(authActions.setUser());
-		navigate("/home");
+		if (userLogin.usernameOrEmail && userLogin.password) {
+			const body = {
+				usernameOrEmail: userLogin.usernameOrEmail,
+				password: userLogin.password,
+			};
+
+			const response = await fetch("http://localhost:3306/api/users/signin", {
+				method: "POST",
+				body: JSON.stringify(body),
+				headers: {
+					"Content-type": "application/json",
+				},
+			});
+
+			const data = await response.json();
+			if (data.status === 200) {
+				navigate("/home");
+				dispatch(authActions.setUser(data.token));
+				setUserLogin({
+					usernameOrEmail: "",
+					password: "",
+				});
+			} else {
+				console.log(data);
+			}
+		}
 	};
 
 	return (
@@ -33,17 +56,18 @@ const Signin = () => {
 					<div className="mt-10 sm:mx-auto sm:w-full">
 						<form className="space-y-4" onSubmit={submitHandler}>
 							<div>
-								<label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-									Email address
+								<label htmlFor="usernameOrEmail" className="block text-sm font-medium leading-6 text-gray-900">
+									Username or Email
 								</label>
 								<div className="mt-2">
 									<input
-										id="email"
-										name="email"
-										type="email"
-										autoComplete="email"
+										id="usernameOrEmail"
+										name="usernameOrEmail"
+										type="text"
+										autoComplete="usernameOrEmail"
 										required
-										onChange={(e) => setUserLogin((prevItem) => ({ ...prevItem, email: e.target.value }))}
+										onChange={(e) => setUserLogin((prevItem) => ({ ...prevItem, usernameOrEmail: e.target.value }))}
+										value={userLogin.usernameOrEmail}
 										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 									/>
 								</div>
@@ -68,6 +92,7 @@ const Signin = () => {
 										autoComplete="current-password"
 										required
 										onChange={(e) => setUserLogin((prevItem) => ({ ...prevItem, password: e.target.value }))}
+										value={userLogin.password}
 										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 									/>
 									<div className="absolute top-1/4 right-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
