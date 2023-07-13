@@ -33,12 +33,18 @@ const Signin = () => {
 
 			const data = await response.json();
 			if (data.status === 200) {
+				console.log(data);
 				navigate("/home");
-				dispatch(authActions.setUser(data.token));
 				setUserLogin({
 					usernameOrEmail: "",
 					password: "",
 				});
+				localStorage.setItem("token", data.token);
+				localStorage.setItem("userId", data.user.id);
+				localStorage.setItem("username", data.user.username);
+				localStorage.setItem("email", data.user.email);
+				dispatch(authActions.setUser(data.user));
+				dispatch(authActions.setToken(data.token));
 			} else {
 				console.log(data);
 			}

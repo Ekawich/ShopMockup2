@@ -50,7 +50,7 @@ const signin = async (req, res) => {
         }
 
         const token = jwt.generateToken({ userId: user.id })
-        res.status(200).json({ status: 200, message: 'Authentication successful', token: token })
+        res.status(200).json({ status: 200, message: 'Authentication successful', user, token })
     } catch (err) {
         console.error('Error signing in')
         res.status(500).json({ status: 500, message: 'Internal server error' })

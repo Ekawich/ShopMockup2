@@ -1,4 +1,6 @@
 import React, { Fragment } from "react";
+import { useDispatch } from "react-redux";
+import { authActions } from "../store/auth";
 
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { FaBell, FaBars } from "react-icons/fa";
@@ -17,6 +19,14 @@ function classNames(...classes) {
 }
 
 const Navbars = () => {
+	const dispatch = useDispatch();
+
+	const signout = () => {
+		dispatch(authActions.removeToken());
+		dispatch(authActions.removeUser());
+		localStorage.clear();
+	};
+
 	return (
 		<Disclosure as="nav" className="bg-gray-800">
 			{({ open }) => (
@@ -108,7 +118,11 @@ const Navbars = () => {
 											</Menu.Item>
 											<Menu.Item>
 												{({ active }) => (
-													<a href="#" className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm text-gray-700")}>
+													<a
+														href="/"
+														className={classNames(active ? "bg-gray-100" : "", "block px-4 py-2 text-sm text-gray-700")}
+														onClick={signout}
+													>
 														Sign out
 													</a>
 												)}
