@@ -25,7 +25,7 @@ const signup = async (req, res) => {
         }
 
         const userId = await User.create(user)
-        res.status(200).json({ message: 'User created' })
+        res.status(200).json({ message: 'User created', userId })
     } catch (err) {
         console.error('Error signing up', err)
         res.status(500).json({ message: 'Internal server error' })
@@ -34,7 +34,7 @@ const signup = async (req, res) => {
 
 const signin = async (req, res) => {
     const { usernameOrEmail, password } = req.body
-    console.log(usernameOrEmail, password)
+    console.log(usernameOrEmail, password, '---')
 
     try {
         // Find the user by username or email

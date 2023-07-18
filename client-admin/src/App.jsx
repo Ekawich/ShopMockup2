@@ -9,11 +9,7 @@ import { useEffect } from "react";
 function App() {
 	const dispatch = useDispatch();
 	const token = localStorage.getItem("token") || null;
-	const user = {
-		id: localStorage.getItem("id") || "",
-		username: localStorage.getItem("username") || "",
-		email: localStorage.getItem("email") || "",
-	};
+	const user = JSON.parse(localStorage.getItem("user")) || null;
 	const isLogin = useSelector((state) => state.auth.isLogin);
 
 	useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,38 +12,76 @@ const Signup = () => {
 		password: "",
 		cpassword: "",
 	});
+	const [errors, setErrors] = useState({});
 	const [isLoading, setIsLoading] = useState(false);
+
+	const validation = () => {
+		const errors = {};
+		const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+		if (!user.username) {
+			errors.username = "Username is required";
+		}
+
+		if (!user.email) {
+			errors.email = "Email is required";
+		} else if (!emailRegex.test(user.email)) {
+			errors.email = "Email is invalid form";
+		}
+
+		if (!user.password) {
+			errors.password = "Password is required";
+		} else if (user.password.length < 7) {
+			errors.password = "Password should be at least 7 characters long";
+		}
+
+		if (!user.cpassword) {
+			errors.cpassword = "Confirm password is required";
+		} else if (user.password !== user.cpassword) {
+			errors.cpassword = "Password do not match";
+		}
+
+		setErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
 
 	const submitHandler = async (e) => {
 		e.preventDefault();
-		setIsLoading(true);
-		try {
-			const body = {
-				username: user.username,
-				email: user.email,
-				password: user.password,
-			};
 
-			const response = await fetch("http://localhost:3306/api/users/signup", {
-				method: "POST",
-				body: JSON.stringify(body),
-				headers: {
-					"Content-type": "application/json",
-				},
-			});
-			const data = await response.json();
-			console.log(data);
-		} catch (err) {
-			console.error(err);
-		} finally {
-			toast.success("User has been created!");
-			setUser({
-				username: "",
-				email: "",
-				password: "",
-				cpassword: "",
-			});
-			setIsLoading(false);
+		const validate = validation();
+		console.log(validate);
+		if (validate) {
+			try {
+				const body = {
+					username: user.username,
+					email: user.email,
+					password: user.password,
+				};
+
+				const response = await fetch("http://localhost:3306/api/users/signup", {
+					method: "POST",
+					body: JSON.stringify(body),
+					headers: {
+						"Content-type": "application/json",
+					},
+				});
+				const data = await response.json();
+				console.log(data);
+			} catch (err) {
+				console.error(err);
+			} finally {
+				toast.success("User has been created!", {
+					autoClose: 1500,
+				});
+				setUser({
+					username: "",
+					email: "",
+					password: "",
+					cpassword: "",
+				});
+				setIsLoading(false);
+				navigate("/");
+			}
 		}
 	};
 	return (
@@ -68,10 +106,11 @@ const Signup = () => {
 											type="text"
 											autoComplete="username"
 											required
-											onChange={(e) => setUser((prevItem) => ({ ...prevItem, username: e.target.value }))}
+											onChange={(e) => setUser((prevItem) => ({ ...prevItem, username: e.target.value.trim() }))}
 											value={user.username}
 											className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 										/>
+										{errors.username && <p className="text-red-500 text-xs italic">{errors.username}</p>}
 									</div>
 								</div>
 
@@ -86,10 +125,11 @@ const Signup = () => {
 											type="email"
 											autoComplete="email"
 											required
-											onChange={(e) => setUser((prevItem) => ({ ...prevItem, email: e.target.value }))}
+											onChange={(e) => setUser((prevItem) => ({ ...prevItem, email: e.target.value.trim() }))}
 											value={user.email}
 											className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 										/>
+										{errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
 									</div>
 								</div>
 
@@ -108,6 +148,7 @@ const Signup = () => {
 											value={user.password}
 											className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 										/>
+										{errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
 									</div>
 								</div>
 
@@ -126,6 +167,7 @@ const Signup = () => {
 											value={user.cpassword}
 											className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 										/>
+										{errors.cpassword && <p className="text-red-500 text-xs italic">{errors.cpassword}</p>}
 									</div>
 								</div>
 

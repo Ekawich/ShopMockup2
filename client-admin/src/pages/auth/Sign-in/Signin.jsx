@@ -40,9 +40,7 @@ const Signin = () => {
 					password: "",
 				});
 				localStorage.setItem("token", data.token);
-				localStorage.setItem("userId", data.user.id);
-				localStorage.setItem("username", data.user.username);
-				localStorage.setItem("email", data.user.email);
+				localStorage.setItem("user", JSON.stringify(data.user));
 				dispatch(authActions.setUser(data.user));
 				dispatch(authActions.setToken(data.token));
 			} else {
